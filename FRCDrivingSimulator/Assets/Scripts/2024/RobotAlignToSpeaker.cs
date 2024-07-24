@@ -207,6 +207,11 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
 
         Quaternion targetRotation = Quaternion.Euler(-100f, 0f, 0f);
 
+        if(robot == RobotSettings.CCShambots)
+        {
+            targetRotation = Quaternion.Euler(-30f, 0f, 0f);
+        }
+
         float elapsedTime = 0f;
         float duration = ampDuration;
 
@@ -276,6 +281,10 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
 
         Vector3 euler = targetShooterRotation.eulerAngles;
         if (useLimits) { euler.x = Mathf.Clamp(euler.x, minAngle, maxAngle); }
+        if(robot == RobotSettings.CCShambots)
+        {
+            euler.x = euler.x + 20;
+        }
         euler.y = shooterPivot.transform.rotation.eulerAngles.y;
         euler.z = shooterPivot.transform.rotation.eulerAngles.z;
         targetShooterRotation = Quaternion.Euler(euler);

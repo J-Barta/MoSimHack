@@ -14,7 +14,8 @@ public enum RobotSettings
     CitrusCircuits,
     Robotnauts,
     HighTide,
-    StealthRobotics
+    StealthRobotics,
+    CCShambots
 }
 
 public enum SourceMode 
