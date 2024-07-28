@@ -8,6 +8,7 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
     [SerializeField] private RobotSettings robot;
 
     public Transform target;
+    public Transform lobTarget;
     public GameObject shooterPivot;
     public Rigidbody robotRigidbody;
 
@@ -15,6 +16,9 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
     public float rotationSpeed = 50f;
     public float ampRotationSpeed = 100f;
     public float ampDuration = 0f;
+
+    public float closeShotDistance = 20f;
+    public float closeShotOffset = 2f;
 
     public float downwardOffset;
 
@@ -126,7 +130,7 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
                             if (distanceToTarget <= 26f && is1678) { downwardOffset = 17.5f; }
                             else if (is1678) { downwardOffset = 16.6f; }
 
-                            RotateShooter();
+                            RotateShooter(distanceToTarget);
                             stowedShooter = false;
                         }
                         else if (distanceToTarget > maxAimDistance && robotHasUniquePassAngle && !(pass > 0f) && !stowedShooter)
@@ -154,13 +158,18 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
                     }
                     else if (distanceToTarget <= maxAimDistance && !stowedShooter)
                     {
-                        RotateShooter();
+                        RotateShooter(distanceToTarget);
                     }
 
                     if (alignWholeRobot > 0f && canDoAlign && distanceToTarget <= maxAimDistance)
                     {
                         canDoAlign = false;
                         RotateRobotToTarget();
+                    } else if (robot == RobotSettings.CCShambots && alignWholeRobot > 0f && canDoAlign && !isShooting && drive.isGrounded)
+                    {
+                        canDoAlign = false;
+                        isShooting = true;
+                        StartCoroutine(RotateTowardsTarget(targetRotation, lobTarget));
                     }
                     else if (alignWholeRobot == 0f)
                     {
@@ -250,20 +259,35 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
 
             targetRotation = Quaternion.LookRotation(directionToTarget, Vector3.up);
 
-            StartCoroutine(RotateTowardsTarget(targetRotation));
+            StartCoroutine(RotateTowardsTarget(targetRotation, target));
         }
     }
 
-    private IEnumerator RotateTowardsTarget(Quaternion targetRotation)
+    private IEnumerator RotateTowardsTarget(Quaternion targetRotation, Transform targetPosition)
     {
         if (alliance == Alliance.Blue) { DriveController.canBlueRotate = false; }
         else { DriveController.canRedRotate = false; }
 
-        while (Quaternion.Angle(robotRigidbody.rotation, targetRotation) > 0.1f)
-        {
-            robotRigidbody.rotation = Quaternion.RotateTowards(robotRigidbody.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            yield return null;
+        if (robot != RobotSettings.CCShambots) {
+            while (Quaternion.Angle(robotRigidbody.rotation, targetRotation) > 0.1f) { 
+
+                robotRigidbody.rotation = Quaternion.RotateTowards(robotRigidbody.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                yield return null;
+            }
+        } else {
+            while (alignWholeRobot > 0f)
+            {
+                Vector3 directionToTarget = targetPosition.position - transform.position;
+                directionToTarget.y = 0f;
+
+                targetRotation = Quaternion.LookRotation(directionToTarget, Vector3.up);
+
+                robotRigidbody.rotation = Quaternion.RotateTowards(robotRigidbody.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                yield return null;
+            }
+            
         }
+       
 
         if (alliance == Alliance.Blue) { DriveController.canBlueRotate = true; }
         else { DriveController.canRedRotate = true; }
@@ -271,7 +295,7 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
         isShooting = false;
     }
 
-    private void RotateShooter()
+    private void RotateShooter(float distanceToTarget)
     {
         Vector3 targetPositionWithOffset = target.position - Vector3.up * downwardOffset;
 
@@ -284,6 +308,11 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
         if(robot == RobotSettings.CCShambots)
         {
             euler.x = euler.x + 20;
+
+            if(distanceToTarget < closeShotDistance)
+            {
+                euler.x = euler.x - closeShotOffset * distanceToTarget;
+            }
         }
         euler.y = shooterPivot.transform.rotation.eulerAngles.y;
         euler.z = shooterPivot.transform.rotation.eulerAngles.z;
