@@ -268,7 +268,7 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
         if (alliance == Alliance.Blue) { DriveController.canBlueRotate = false; }
         else { DriveController.canRedRotate = false; }
 
-        if (robot != RobotSettings.CCShambots) {
+        if (robot != RobotSettings.CCShambots && robot != RobotSettings.CitrusCircuits) {
             while (Quaternion.Angle(robotRigidbody.rotation, targetRotation) > 0.1f) { 
 
                 robotRigidbody.rotation = Quaternion.RotateTowards(robotRigidbody.rotation, targetRotation, rotationSpeed * Time.deltaTime);

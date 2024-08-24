@@ -74,10 +74,6 @@ public class JointBackpackAmpArm : MonoBehaviour, IResettable
         }
         else 
         {
-            if (robot == RobotSettings.CitrusCircuits) 
-            {
-                if (!moveIntake) { intake.StowIntake(); moveIntake = true; intake.isAmping = false; }
-            }
             robotController.canIntake = true;
         }
     }
@@ -92,11 +88,17 @@ public class JointBackpackAmpArm : MonoBehaviour, IResettable
 
         source.resource = stall;
         source.Play();
-        
-        yield return new WaitForSeconds(0.98f);
+        yield return new WaitForSeconds(0.4f);
 
         isAtPosition = true;
         isMoving = false;
+        if (robot == RobotSettings.CitrusCircuits)
+        {
+            if (!moveIntake) { intake.StowIntake(); moveIntake = true; intake.isAmping = false; }
+        }
+        robotController.canIntake = true;
+
+        yield return new WaitForSeconds(0.58f);
     }
 
 

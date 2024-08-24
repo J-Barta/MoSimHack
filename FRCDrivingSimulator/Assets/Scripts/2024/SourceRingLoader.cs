@@ -24,7 +24,7 @@ public class SourceRingLoader : MonoBehaviour, IResettable
     private float drop;
 
     private int lastRandomNum = -1;
-    private int noteCount = 45;
+    private int noteCount = 60;
 
     private void Start() 
     {
@@ -141,7 +141,7 @@ public class SourceRingLoader : MonoBehaviour, IResettable
 
     public void Reset() 
     {
-        noteCount = 45;
+        noteCount = 60;
         counterText.text = noteCount.ToString();
     }
 
