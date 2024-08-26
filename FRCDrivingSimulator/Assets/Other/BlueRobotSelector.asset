@@ -22,6 +22,3 @@ MonoBehaviour:
   - robotName: Citrus Circuits
     robotImage: {fileID: 21300000, guid: 4031a5d5f7b3d2745b45e0a7f5e67141, type: 3}
     robotNumber: 1678
-  - robotName: CC Shambots
-    robotImage: {fileID: 21300000, guid: d1d388e89256f3a478336e8dc6ebbcce, type: 3}
-    robotNumber: 5907
